@@ -2,31 +2,38 @@
 {
     static void Main(string[] args)
     {
-        // Menu screen
-        Console.Clear();
-        Console.WriteLine("--- High File Size Finder ---");
-        Console.WriteLine("Choose an option:");
-        Console.WriteLine("1) Find 10 largest files");
-        Console.WriteLine("2) List all files and their size, grouped by size");
-        Console.WriteLine("3) Exit");
-        Console.Write("\r\nSelect an option: ");
+        bool running = true;
 
-        string choice = Console.ReadLine();
-    
-        switch (choice)
-        {
-            case "1":
-                TenLargest();
-                return;
-            case "2":
-                ListAll();
-                return;
-            case "3":
-                Console.WriteLine("Exiting");
-                return;
-            default:
-                return;
+        while (running)
+            {
+        
+            // Menu screen
+            Console.Clear();
+            Console.WriteLine("--- High File Size Finder ---");
+            Console.WriteLine("Choose an option:");
+            Console.WriteLine("1) Find 10 largest files");
+            Console.WriteLine("2) List all files and their size, grouped by size");
+            Console.WriteLine("3) Exit");
+            Console.Write("\r\nSelect an option: ");
+
+            string choice = Console.ReadLine();
+        
+            switch (choice)
+            {
+                case "1":
+                    TenLargest();
+                    break;
+                case "2":
+                    ListAll();
+                    break;
+                case "3":
+                    Console.WriteLine("Exiting");
+                    return;
+                default:
+                    break;
+            }
         }
+        Console.WriteLine("Program has ended");
     }
 
     static void TenLargest()
@@ -83,6 +90,16 @@
             Console.WriteLine($"{v.FullName}: { Math.Round(v.Length / (1024.0 * 1024.0), 2)} MB");
         }
         Console.WriteLine($"---------");
+
+        // Prompt user if they want to go back to main menu
+        Console.WriteLine("1) Back to main menu");
+        switch (Console.ReadLine())
+        {
+            case "1":
+                break;
+            default:
+                break;
+        }
     }
 
     static void ListAll() {
@@ -141,6 +158,15 @@
             }
         }
         Console.WriteLine($"---------");
-        
+
+        // Prompt user if they want to go back to main menu
+        Console.WriteLine("1) Back to main menu");
+        switch (Console.ReadLine())
+        {
+            case "1":
+                break;
+            default:
+                break;
+        }
     }
 }
