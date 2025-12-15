@@ -15,6 +15,7 @@
         }
 
         // Confirm file path
+        Console.WriteLine($"---------");
         Console.WriteLine($"Path is: {path}");
 
         // Get the files in the folder path
@@ -37,8 +38,22 @@
         double totalBytesSizeMB = Math.Round(totalBytesSize / (1024.0 * 1024.0), 2);
         double largestFileSizeMB = Math.Round(largestFileSize / (1024.0 * 1024.0), 2);
 
+        // Return the details for the 10 largest files
+        var queryTenLargest = (from file in fileList
+            let fileInfo = new FileInfo(file)
+            let len = fileInfo.Length
+            orderby len descending
+            select fileInfo
+            ).Take(10);
+            
         // Print results
         Console.WriteLine($"There are {fileList.Count()} files in the path with a total size of {totalBytesSizeMB} MB.");
-        Console.WriteLine($"The largest file is {largestFileSizeMB} MB.");
+        Console.WriteLine($"The 10 largest files are:");
+        foreach (var v in queryTenLargest) // List the name and size (converted to MB) of the 10 largest files
+        {
+            Console.WriteLine($"{v.FullName}: { Math.Round(v.Length / (1024.0 * 1024.0), 2)} MB");
+        }
+        Console.WriteLine($"---------");
+        
     }
 }
