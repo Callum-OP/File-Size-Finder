@@ -151,7 +151,7 @@
         Console.WriteLine($"The 10 largest files are:");
         foreach (var filegroup in querySizeGroups)
         {
-            Console.WriteLine($"{filegroup.Key}00000");
+            Console.WriteLine($"{Math.Round(filegroup.Key * 100000 / (1024.0 * 1024.0), 2)} MB");
             foreach (var item in filegroup)
             {
                 Console.WriteLine($"\t{item.Name}: {Math.Round(item.Length / (1024.0 * 1024.0), 2)} MB");
