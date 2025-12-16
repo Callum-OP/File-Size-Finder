@@ -1,4 +1,6 @@
-﻿class Program
+﻿using System.Collections;
+
+class Program
 {
     static void Main(string[] args)
     {
@@ -13,7 +15,8 @@
             Console.WriteLine("Choose an option:");
             Console.WriteLine("1) Find 10 largest files");
             Console.WriteLine("2) List all files and their size, grouped by size");
-            Console.WriteLine("3) Exit");
+            Console.WriteLine("3) Find up to 20 duplicate files");
+            Console.WriteLine("4) Exit");
             Console.Write("\r\nSelect an option: ");
 
             string choice = Console.ReadLine();
@@ -27,8 +30,20 @@
                     ListAll();
                     break;
                 case "3":
+                    FindDuplicates();
+                    break;
+                case "4":
                     Console.WriteLine("Exiting");
                     return;
+                default:
+                    break;
+            } 
+            // Prompt user if they want to go back to main menu
+            Console.WriteLine("1) Back to main menu");
+            switch (Console.ReadLine())
+            {
+                case "1":
+                    break;
                 default:
                     break;
             }
@@ -64,15 +79,11 @@
         // Cache the results to avoid multiple trips to the file system.
         long[] fileLengths = fileQuery.ToArray();
 
-        // Return the size of the largest file
-        long largestFileSize = fileLengths.Max();
-
         // Return the total number of bytes in all the files under the specified folder.
         long totalBytesSize = fileLengths.Sum();
 
         // Translate to MB
         double totalBytesSizeMB = Math.Round(totalBytesSize / (1024.0 * 1024.0), 2);
-        double largestFileSizeMB = Math.Round(largestFileSize / (1024.0 * 1024.0), 2);
 
         // Return the details for the 10 largest files
         var queryTenLargest = (from file in fileList
@@ -90,16 +101,6 @@
             Console.WriteLine($"{v.FullName}: { Math.Round(v.Length / (1024.0 * 1024.0), 2)} MB");
         }
         Console.WriteLine($"---------");
-
-        // Prompt user if they want to go back to main menu
-        Console.WriteLine("1) Back to main menu");
-        switch (Console.ReadLine())
-        {
-            case "1":
-                break;
-            default:
-                break;
-        }
     }
 
     static void ListAll() {
@@ -138,13 +139,13 @@
         // Group the files according to their size, leaving out
         // files that are less than 200000 bytes.
         var querySizeGroups = from file in fileList
-                            let fileInfo = new FileInfo(file)
-                            let len = fileInfo.Length
-                            where len > 0
-                            group fileInfo by (len / 100000) into fileGroup
-                            where fileGroup.Key >= 2
-                            orderby fileGroup.Key descending
-                            select fileGroup;
+            let fileInfo = new FileInfo(file)
+            let len = fileInfo.Length
+            where len > 0
+            group fileInfo by (len / 100000) into fileGroup
+            where fileGroup.Key >= 2
+            orderby fileGroup.Key descending
+            select fileGroup;
             
         // Print results
         Console.WriteLine($"There are {fileList.Count()} files in the path with a total size of {totalBytesSizeMB} MB.");
@@ -158,15 +159,47 @@
             }
         }
         Console.WriteLine($"---------");
+    }
 
-        // Prompt user if they want to go back to main menu
-        Console.WriteLine("1) Back to main menu");
-        switch (Console.ReadLine())
+    static void FindDuplicates()
+    {
+        // Input file path
+        Console.WriteLine("--- Find Duplicate Files ---");
+        Console.Write("Enter the path of the folder you want to scan (e.g., C:\\Users\\YourName): ");
+        string path = Console.ReadLine();
+
+        // Check that file path exists
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
         {
-            case "1":
-                break;
-            default:
-                break;
+            Console.WriteLine("Invalid or non-existent directory path provided.");
+            return;
         }
+
+        // Confirm file path
+        Console.WriteLine($"---------");
+        Console.WriteLine($"Path is: {path}");
+
+        DirectoryInfo dir = new DirectoryInfo(path);
+
+        IEnumerable<FileInfo> fileList = dir.GetFiles("*.*", SearchOption.AllDirectories);
+
+        // Check each file to see if they are exact duplicates
+        int charsToSkip = path.Length;
+        var queryDupNames = from file in fileList
+            group file.FullName.Substring(charsToSkip) by file.Name into fileGroup
+            where fileGroup.Count() > 1
+            select fileGroup;
+
+        // Print results
+        foreach (var queryDup in queryDupNames.Take(20))
+        {
+            Console.WriteLine($"Filename = {(queryDup.Key.ToString() == string.Empty ? "[none]" : queryDup.Key.ToString())}");
+
+            foreach (var fileName in queryDup.Take(10))
+            {
+                Console.WriteLine($"\t{fileName}");
+            }   
+        }
+        Console.WriteLine($"---------");
     }
 }
